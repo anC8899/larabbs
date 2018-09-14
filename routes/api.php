@@ -68,6 +68,9 @@ $api->version('v1' , [
             ->name('api.users.topics.index');
         $api->get('topics/{topic}','TopicsController@show')
             ->name('api.topics.show');
+        // 资源推荐
+        $api->get('links', 'LinksController@index')
+            ->name('api.links.index');
         
         
         // 需要 token 验证的接口
