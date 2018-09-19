@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use Auth;
 use App\Models\User;
+use EasyWeChat;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\AuthorizationRequest;
 use App\Http\Requests\Api\SocialAuthorizationRequest;
 use App\Http\Requests\Api\WeappAuthorizationRequest;
+use EasyWeChat\Factory;
 
 class AuthorizationsController extends Controller
 {
@@ -107,7 +109,7 @@ class AuthorizationsController extends Controller
         $code = $request->code;
 
         // 根据 code 获取微信 openid 和 session_key
-        $miniProgram = \EasyWeChat::miniProgram();
+        $miniProgram = EasyWeChat::miniProgram();
         $data = $miniProgram->auth->session($code);
         
         // 如果结果错误，说明 code 已过期或不正确，返回 401 错误
@@ -153,5 +155,22 @@ class AuthorizationsController extends Controller
         $token = Auth::guard('api')->fromUser($user);
         
         return $this->respondWithToken($token)->setStatusCode(201);
+    }
+    
+    public function weappUserSession (WeappAuthorizationRequest $request)
+    {
+        $app = EasyWeChat::miniProgram();
+        $session = $app->auth->session($request->code);
+        return $this->response->array($session)->setStatusCode(200);
+    }
+    
+    public function weappUserInfo (Request $request)
+    {
+        $sessionKey = $request->session_key;
+        $iv = $request->iv;
+        $encryptData = $request->encryptData;
+        $app = EasyWeChat::miniProgram();
+        $decryptedData = $app->encryptor->decryptData($sessionKey, $iv, $encryptData);
+        return $this->response->array($decryptedData);
     }
 }

@@ -51,6 +51,10 @@ $api->version('v1' , [
         // 小程序注册
         $api->post('weapp/users', 'UsersController@weappStore')
             ->name('api.weapp.users.store');
+        $api->post('weapp/userSession', 'AuthorizationsController@weappUserSession')
+            ->name('api.weapp.authorizations.userSession');
+        $api->post('weapp/userInfo', 'AuthorizationsController@weappUserInfo')
+            ->name('api.weapp.authorizations.userinfo');
     
         // 刷新token
         $api->put('authorizations/current', 'AuthorizationsController@update')
